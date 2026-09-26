@@ -92,20 +92,25 @@
 ### 5. Docker 容器化部署
 
 ```bash
-# 1. 后台启动容器 (自动构建并运行)
+# 1. 后台启动容器 (拉取 GHCR 预构建镜像)
 docker compose up -d
 
 # 2. 查看网关日志
 docker compose logs -f
 ```
 
+> 如需本地构建镜像代替拉取，运行：`docker compose up -d --build`。
+
 或直接 `docker run`：
 
 ```bash
 docker run -d --name qoder-proxy --restart unless-stopped \
   -p 8790:8790 -v $(pwd)/accounts:/app/accounts -v $(pwd)/usage:/app/usage \
-  -e API_KEY=your_secret_key $(docker build -q .)
+  -e API_KEY=your_secret_key ghcr.io/jinsfoni/qoder2api-hub:latest
 ```
+
+- **预构建镜像**：发布 Release 时自动构建双架构镜像 (`amd64` / `arm64`) 并推送到 GHCR，
+  标签规则：`v1.2.3` Release → `latest`、`1.2.3`、`1.2`、`1`；
 
 - **持久化目录**：`./accounts`（账号凭证及出口设置）与 `./usage`（请求流水与指标快照）；
 - **配置参数**：环境变量 `API_KEY`、`PORT`。
